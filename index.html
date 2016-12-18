@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- By Stephen Nguyen -->
+    <meta charset="UTF-8">
+    <title>Movie Search</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <h1>Ajax Movie and Actor Search</h1>
+
+    Title: <input type="text" id="title" onkeyup="getList()">
+    Actor: <input type="text" id="actor" onkeyup="getList()"> (last name, first name)
+    <br>
+	<div id="divToChange">
+
+    </div>
+
+    <script>
+    function getList(){
+        var title = document.getElementById("title").value;
+        var actor = document.getElementById("actor").value;
+        var actor_names = actor.split(",");
+        var last_name = actor_names[0];
+        var first_name = actor_names[1];
+        if(first_name == null){
+            first_name = "";
+        }
+
+        title = title.trim();
+        last_name = last_name.trim();
+        first_name = first_name.trim();
+        var params = "title=" + title + "&last="+last_name+"&first="+first_name;
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "controller.php", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.onreadystatechange = function(){
+            if(xhttp.readyState == 4 && xhttp.status == 200){
+                var array = JSON.parse(xhttp.responseText);
+                if(title !== "" || actor !== ""){
+                    var str = "";
+                    str += "<table>";
+                    str += "<tr><th>Title</th><th>Actor</th><th>Year</th></tr>";
+                    for(i = 0; i < array.length; i++){
+                        str += "<tr>";
+                        str += "<td>" + array[i]['name'] + "</td>";
+                        str += "<td>" + array[i]['first_name'] + " "+ array[i]['last_name']+ "</td>";
+                        str += "<td>" + array[i]['year'] + "</td>";
+                        str += "</tr>";
+                    }
+                    str += "</table>";
+                    document.getElementById("divToChange").innerHTML = str;
+                }
+                else {
+                    document.getElementById("divToChange").innerHTML = "";
+                }
+            }
+        }
+        xhttp.send(params);
+    }
+    </script>
+
+</body>
+</html>
